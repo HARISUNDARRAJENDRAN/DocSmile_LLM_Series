@@ -75,24 +75,29 @@ apt-get update -qq
 apt-get install -y -qq git tmux htop nano curl wget tree >/dev/null
 
 # --- 3. Python deps from requirements.txt ---
-# IMPORTANT FLAGS:
-#   --no-deps-on-torch via constraints below would be cleaner; instead we
-#   skip torch by pinning it to whatever's already installed (a constraint
-#   file referring to the live torch version).
+# CRITICAL FLAGS:
+#   --no-deps  : the requirements.txt is a hand-curated COMPATIBLE matrix.
+#                If pip resolves dependencies, it pulls newer transformers,
+#                which then crashes on torch.int1 (needs torch >= 2.6).
+#   --force-reinstall : the Vast.ai image may already have older versions of
+#                some packages. Force a clean replacement.
 echo "[2/6] Installing Python deps (this is the slow part)..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 pip install --no-cache-dir --upgrade pip wheel setuptools >/dev/null
 
-# Generate a constraints file that pins torch to its currently-installed
-# version so the upcoming `pip install -r requirements.txt` never replaces it.
-INSTALLED_TORCH="$(python -c 'import torch; print(torch.__version__)')"
-TORCH_PIN="${INSTALLED_TORCH%%+*}"   # strip +cu121 suffix if present
-CONSTRAINTS="$(mktemp)"
-echo "torch==${INSTALLED_TORCH}" > "${CONSTRAINTS}"
-echo "  (torch pinned to ${INSTALLED_TORCH} via temporary constraint file)"
+# Pre-install shared utility packages with normal dep resolution so common
+# transitive deps (numpy, pyarrow, etc.) are present.
+pip install --no-cache-dir \
+    sentencepiece "protobuf>=4.25,<6" \
+    "huggingface-hub>=0.26.0,<1" "safetensors>=0.4.5" \
+    "tensorboard>=2.18.0" "psutil>=6.0" "nvidia-ml-py>=12.560.30" \
+    "pyyaml>=6.0" "tqdm>=4.66" einops
 
-pip install --no-cache-dir -c "${CONSTRAINTS}" -r "${SCRIPT_DIR}/requirements.txt"
-rm -f "${CONSTRAINTS}"
+# Now install the training stack with --no-deps. This locks in the exact
+# tested-compatible versions and prevents pip from "upgrading" us into broken
+# combinations.
+pip install --no-cache-dir --force-reinstall --no-deps \
+    -r "${SCRIPT_DIR}/requirements.txt"
 
 # --- 4. FlashAttention 2 (prebuilt wheel) ---
 echo "[3/6] Installing FlashAttention 2..."
