@@ -1,0 +1,31 @@
+# DocSmile CPT training requirements
+# Pinned versions for reproducibility on Vast.ai (Ubuntu + CUDA 12.1)
+
+# Core training stack
+unsloth==2025.5.5
+unsloth-zoo==2025.5.5
+torch==2.4.0
+transformers==4.46.3
+trl==0.12.2
+peft==0.13.2
+accelerate==1.1.1
+bitsandbytes==0.44.1
+datasets==3.1.0
+
+# FlashAttention 2 (pre-built wheel, no source compile)
+# Install separately via setup_vast.sh with --no-build-isolation
+
+# Tokenizer + IO
+sentencepiece==0.2.0
+protobuf==4.25.5
+huggingface-hub==0.26.2
+safetensors==0.4.5
+
+# Monitoring
+tensorboard==2.18.0
+psutil==6.1.0
+nvidia-ml-py==12.560.30
+
+# Configuration + logging
+pyyaml==6.0.2
+tqdm==4.66.6

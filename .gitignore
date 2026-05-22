@@ -1,1 +1,120 @@
+# ==========================================================================
+# DocSmile .gitignore
+# Keep the repo to source code, configs, and small metadata. Everything large
+# or sensitive lives outside git (HF Hub for data/checkpoints, .env for keys).
+# ==========================================================================
+
+# --- Secrets ---
+.env
+*.env
+!*.env.example
+.env.local
+.env.*.local
+*token*.txt
+*secret*.txt
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+
+# --- Virtual envs ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- IDE / editor ---
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Claude / agent state ---
+.claude/
+
+# --- Large datasets (live in HF Hub, not git) ---
+FINAL/
+cpt_prepared/
+rl/
+rl_prepared/
+vlm_prepared/
+core_cpt/
+selective_cpt/
+dental_QA/
+Open-Domain-Oral-Disease-QA-Dataset/
+tmp_cpt_smoke/
+outputs/
+docs/
+IMAGES/
+logs/
+configs/
+
+# --- Eval results (regeneratable, keep eval prompts in evals/text_only/) ---
+evals/results/
+evals/lightning/
+
+# --- Training artifacts ---
+checkpoints/
+runs/
+tensorboard/
+wandb/
+*.ckpt
+*.pt
+*.bin
+*.safetensors
+
+# --- Large archives ---
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# --- Large media / binary ---
+*.xlsx
+*.xls
+*.pdf
+*.png
+
+*.jpg
+*.jpeg
+*.mp4
+*.mov
+
+# Allow specific small images and docs back in if needed:
+!docs/**/*.png
+!docs/**/*.jpg
+!README*.md
+
+# --- Notebooks (allow but strip output via nbstripout if used) ---
+.ipynb_checkpoints/
+
+# --- HuggingFace / model caches ---
+.hf_cache/
+hf_cache/
+.cache/
+
+# --- Project-specific archives ---
+cpt_eval_bundle.tar.gz
+cpt_vast_upload.tar.gz
+DocSmile_Book_Tiers.xlsx
+
+# --- Misc ---
+unwanted/
 /unwanted
+*.log

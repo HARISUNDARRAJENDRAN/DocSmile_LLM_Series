@@ -31,3 +31,23 @@ DocSmile is designed with extensibility in mind, supporting integration with:
 *   **Interactive Educational Tools:** Enhancing learning for students and professionals.
 *   **Clinical Decision-Support Systems:** Providing real-time insights for dental practitioners.
 *   **Next-Gen AI Healthcare:** Laying the groundwork for advanced, AI-assisted healthcare applications.
+
+---
+
+## RL Dataset Generation (SFT + DPO)
+Use [scripts/build_rl_datasets_gemini.py](scripts/build_rl_datasets_gemini.py) to convert Markdown under the rl folder into high-quality QLoRA SFT and DPO datasets using Gemini.
+
+Outputs include SFT and DPO JSONL files plus progress and state files in the output directory you specify.
+
+Example run:
+
+```powershell
+python scripts/build_rl_datasets_gemini.py --input-dir rl --output-dir rl_prepared --model gemini-3.1-flash-lite-preview --continue-on-error
+```
+
+Live progress (reuses the watcher):
+
+```powershell
+python scripts/watch_clean_progress.py --output-dir rl_prepared
+```
+

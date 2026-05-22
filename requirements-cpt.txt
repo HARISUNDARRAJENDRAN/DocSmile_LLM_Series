@@ -1,0 +1,18 @@
+# Install PyTorch separately for the CUDA version on the AWS image, for example:
+# pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+transformers>=4.49.0
+accelerate>=1.5.0
+peft>=0.14.0
+bitsandbytes>=0.45.0
+datasets>=3.0.0
+trl>=0.15.0
+liger-kernel>=0.5.0
+wandb>=0.19.0
+tensorboard>=2.18.0
+safetensors>=0.4.5
+sentencepiece>=0.2.0
+protobuf>=5.28.0
+einops>=0.8.0
+
+# Linux GPU hosts only. Install after PyTorch is present.
+deepspeed>=0.16.0; platform_system == "Linux"

@@ -1,0 +1,12 @@
+{
+  "seed": 42,
+  "datasets": {
+    "medmcqa_dental_mcq.jsonl": 250,
+    "oral_disease_open_qa.jsonl": 250,
+    "dental_forum_open_qa.jsonl": 500
+  },
+  "notes": [
+    "Frozen pre-CPT baseline eval pack. Do not train on these rows.",
+    "MCQ can be scored automatically. Open QA should be judged manually or with a separate judge model."
+  ]
+}
