@@ -1,31 +1,39 @@
 # DocSmile CPT training requirements
-# Pinned versions for reproducibility on Vast.ai (Ubuntu + CUDA 12.1)
+# Versions chosen for Vast.ai instances on the
+# pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime base image.
+#
+# Philosophy:
+#   - torch is NOT pinned: the Vast.ai image ships a working CUDA-matched build.
+#     Touching it can break the CUDA install. We trust the image's torch.
+#   - unsloth-zoo is NOT pinned: it's a strict dep of unsloth and the version
+#     range moves together. Pinning both fights pip.
+#   - Everything else gets a >= lower bound for reproducibility, with an
+#     upper bound to block known-breaking majors.
 
-# Core training stack
-unsloth==2025.5.5
-unsloth-zoo==2025.5.5
-torch==2.4.0
-transformers==4.46.3
-trl==0.12.2
-peft==0.13.2
-accelerate==1.1.1
-bitsandbytes==0.44.1
-datasets==3.1.0
+# --- Core training stack ---
+unsloth>=2025.5.5,<2026
+transformers>=4.46.0,<4.49
+trl>=0.12.0,<0.13
+peft>=0.13.0,<0.15
+accelerate>=1.1.0,<2
+bitsandbytes>=0.44.0,<0.46
+datasets>=3.0.0,<4
 
-# FlashAttention 2 (pre-built wheel, no source compile)
-# Install separately via setup_vast.sh with --no-build-isolation
+# --- Tokenizer + IO ---
+sentencepiece>=0.2.0
+protobuf>=4.25,<6
+huggingface-hub>=0.26.0,<1
+safetensors>=0.4.5
 
-# Tokenizer + IO
-sentencepiece==0.2.0
-protobuf==4.25.5
-huggingface-hub==0.26.2
-safetensors==0.4.5
+# --- Monitoring ---
+tensorboard>=2.18.0
+psutil>=6.0
+nvidia-ml-py>=12.560.30
 
-# Monitoring
-tensorboard==2.18.0
-psutil==6.1.0
-nvidia-ml-py==12.560.30
+# --- Config + logging ---
+pyyaml>=6.0
+tqdm>=4.66
 
-# Configuration + logging
-pyyaml==6.0.2
-tqdm==4.66.6
+# FlashAttention 2 is installed separately in setup_vast.sh with
+# --no-build-isolation so it picks up the prebuilt wheel rather than
+# triggering a 20-30 min source compile.

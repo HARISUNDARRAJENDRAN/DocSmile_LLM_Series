@@ -43,7 +43,12 @@ def load_config(path: Path) -> dict:
 
 
 def load_env_dotenv() -> None:
-    """Lightweight .env loader so HF_TOKEN / HF_HOME / etc. work without pip-installing python-dotenv."""
+    """Lightweight .env loader so HF_TOKEN / HF_HOME / etc. work without pip-installing python-dotenv.
+
+    .env values OVERRIDE existing OS env. This is intentional: it prevents a
+    stale HF_TOKEN exported in a previous shell from shadowing a freshly-
+    rotated token in .env. Edit .env to change behaviour, not the shell.
+    """
     env_path = Path(__file__).parent / ".env"
     if not env_path.exists():
         return
@@ -54,7 +59,7 @@ def load_env_dotenv() -> None:
         k, _, v = line.partition("=")
         k = k.strip()
         v = v.strip().strip('"').strip("'")
-        if k and v and k not in os.environ:
+        if k and v:
             os.environ[k] = v
 
 

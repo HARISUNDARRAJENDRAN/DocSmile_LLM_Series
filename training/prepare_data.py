@@ -48,10 +48,15 @@ def _read_env(path: Path) -> dict:
 
 
 def _load_env() -> dict:
-    """Load env from .env then OS environ (OS wins)."""
+    """Load env from .env then OS environ.
+
+    `.env` wins over shell env vars to avoid stale-shell-token foot-guns
+    (e.g. an old HF_TOKEN exported in PowerShell shadowing a freshly-rotated
+    token in .env). If .env is missing a key, fall back to the shell env.
+    """
     env = _read_env(Path(__file__).parent / ".env")
     for k in ("HF_TOKEN", "HF_USERNAME", "HF_DATA_REPO"):
-        if os.environ.get(k):
+        if not env.get(k) and os.environ.get(k):
             env[k] = os.environ[k]
     return env
 
