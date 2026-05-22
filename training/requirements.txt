@@ -1,23 +1,32 @@
 # DocSmile CPT training requirements
-# Versions chosen for Vast.ai instances on the
-# pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime base image.
+#
+# Target Vast.ai image:
+#   pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
+#   (pytorch 2.5.x with CUDA 12.x also works)
+#
+# DO NOT pick a bleeding-edge nightly image (torch >= 2.8 / CUDA 13).
+# Unsloth, flash-attn, and bitsandbytes don't have wheels for those yet.
 #
 # Philosophy:
-#   - torch is NOT pinned: the Vast.ai image ships a working CUDA-matched build.
-#     Touching it can break the CUDA install. We trust the image's torch.
-#   - unsloth-zoo is NOT pinned: it's a strict dep of unsloth and the version
-#     range moves together. Pinning both fights pip.
-#   - Everything else gets a >= lower bound for reproducibility, with an
-#     upper bound to block known-breaking majors.
+#   - torch: NOT pinned here. setup_vast.sh adds a runtime constraint so the
+#     image's torch is never replaced.
+#   - unsloth-zoo: NOT pinned. Strict dep of unsloth; pip resolves it.
+#   - transformers: deliberately unpinned. Unsloth pins it itself, and the
+#     valid range shifts every minor unsloth release. Let unsloth win.
+#   - bitsandbytes: unpinned upper bound — 0.45+ uses different CUDA wheel
+#     layout. unsloth tracks compatible versions.
 
 # --- Core training stack ---
+# Pinning unsloth roughly. Newer is fine but verify it still loads Llama 3.1.
 unsloth>=2025.5.5,<2026
-transformers>=4.46.0,<4.49
-trl>=0.12.0,<0.13
-peft>=0.13.0,<0.15
-accelerate>=1.1.0,<2
-bitsandbytes>=0.44.0,<0.46
-datasets>=3.0.0,<4
+
+# transformers/trl/peft/accelerate: let unsloth choose. We just floor them.
+transformers>=4.46.0
+trl>=0.12.0
+peft>=0.13.0
+accelerate>=1.1.0
+bitsandbytes>=0.44.0
+datasets>=3.0.0
 
 # --- Tokenizer + IO ---
 sentencepiece>=0.2.0
@@ -34,6 +43,4 @@ nvidia-ml-py>=12.560.30
 pyyaml>=6.0
 tqdm>=4.66
 
-# FlashAttention 2 is installed separately in setup_vast.sh with
-# --no-build-isolation so it picks up the prebuilt wheel rather than
-# triggering a 20-30 min source compile.
+# FlashAttention 2 is installed separately in setup_vast.sh.

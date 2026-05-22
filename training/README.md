@@ -49,8 +49,11 @@ Pick an instance with:
 
 - **GPU**: 1 × A100 80GB *or* A100 40GB (40GB is fine for this config)
 - **Disk**: ≥ 50 GB (model weights + caches + checkpoints)
-- **Image**: `pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime` (or any
-  PyTorch 2.4 + CUDA 12.1 base — same wheels work)
+- **Image**: must be **torch 2.4–2.7 + CUDA 12.x**. Tested combinations:
+  - `pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime` (recommended)
+  - `pytorch/pytorch:2.5.1-cuda12.1-cudnn9-runtime`
+  - **Do NOT pick** torch 2.8+/2.10 or CUDA 13.x images — Unsloth and
+    flash-attn don't have matching wheels and `pip install` will fail.
 - **Region**: cheapest available; we don't depend on a specific one
 
 Bid on a spot instance only if the persistent volume is enabled — otherwise

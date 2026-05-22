@@ -16,7 +16,7 @@ echo "============================================================"
 echo "DocSmile Vast.ai setup"
 echo "============================================================"
 
-# --- 0. Sanity: GPU + CUDA must already work ---
+# --- 0. Sanity: GPU + CUDA + torch in the compatibility window ---
 echo "[0/6] Pre-flight: checking GPU + torch + CUDA on the image..."
 python - <<'PY'
 import sys
@@ -35,12 +35,28 @@ print(f"  torch.cuda     : {cuda_ver}")
 print(f"  device         : {torch.cuda.get_device_name(0)}")
 print(f"  bf16 supported : {torch.cuda.is_bf16_supported()}")
 
-# Warn if we're outside the wheel's sweet spot
+# Unsloth supports torch 2.4 .. 2.7 (as of 2025.6.x). Block both extremes
+# *before* we waste 5 minutes on a doomed pip install.
 major, minor = (int(x) for x in ver.split('+')[0].split('.')[:2])
-if (major, minor) < (2, 2):
-    sys.exit(f"ERROR: torch {ver} is older than 2.2 — flash-attn wheels won't match.")
+if (major, minor) < (2, 4):
+    sys.exit(
+        f"ERROR: torch {ver} is older than 2.4 — Unsloth requires >=2.4.\n"
+        f"       Destroy this instance and rent one with image:\n"
+        f"         pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime"
+    )
+if (major, minor) > (2, 7):
+    sys.exit(
+        f"ERROR: torch {ver} is newer than 2.7 — Unsloth and flash-attn don't\n"
+        f"       have wheels for it yet. Destroy this instance and rent one with:\n"
+        f"         pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime\n"
+        f"         (or pytorch:2.5.1-cuda12.1-cudnn9-runtime)"
+    )
 if cuda_ver and not cuda_ver.startswith("12."):
-    print(f"  WARN: cuda {cuda_ver} is not 12.x — flash-attn wheel may not match.")
+    sys.exit(
+        f"ERROR: CUDA {cuda_ver} is not 12.x — flash-attn / bitsandbytes wheels\n"
+        f"       expect CUDA 12.1. Destroy this instance and pick a CUDA 12.x image."
+    )
+print("  -> torch/cuda are in the supported range.")
 PY
 
 # --- 1. Persistent workspace + cache ---
